@@ -9,43 +9,37 @@ def solveNBishops(n):
     
     def backtracking(row, col, curr_board=[]):
         bish_cnt = len(diagsNeg) # Or positive, doesnt matter
+        
         if bish_cnt >= n:
             results.append(deepcopy(curr_board))
             curr_board = board[:]
             return
 
-        if row >= n or col >= n:
+        if col >= n:
+            col, row = 0, row+1
+        elif row >= n:
             return
 
         for col in range(n):
-            # Check if doesn't violate constraints
-            if (row - col) in diagsNeg or (row + col) in diagsPos:
-                continue
-
-            # Add bishop to board
-            curr_board[row][col] = bishop
-
-            # Add diagonal constraints
-            diagsPos.add(row + col); diagsNeg.add(row - col)
-            backtracking(row, col + 1, curr_board)
-
-            # Remove last bishop
-            curr_board[row][col] = "."
-            diagsPos.remove(row + col); diagsNeg.remove(row-col)
-        
-        for row in range(n):
-            # Check if doesn't violate constraints
-            if (row - col) in diagsNeg or (row + col) in diagsPos:
-                continue
             
-            # Add bishop to board
-            curr_board[row][col] = bishop
+            for row in range(n):
+                # Check if doesn't violate constraints
+                if (row - col) in diagsNeg or (row + col) in diagsPos:
+                    continue
 
-            diagsPos.add(row + col); diagsNeg.add(row - col)
-            backtracking(row + 1, col, curr_board)
+                # Add bishop to board
+                curr_board[row][col] = bishop
 
-            curr_board[row][col] = "."
-            diagsPos.remove(row + col); diagsNeg.remove(row-col)
+                # Add diagonal constraints
+                diagsPos.add(row + col); diagsNeg.add(row - col)
+
+                backtracking(row, col, curr_board)
+
+                # Remove last bishop
+                curr_board[row][col] = "."
+                diagsPos.remove(row + col); diagsNeg.remove(row-col)
+        
+        
 
     cp = deepcopy(board)
     backtracking(0, 0, cp)
