@@ -3,50 +3,49 @@ from copy import copy, deepcopy
 
 def solveNBishops(n):
     bishop = "B"
-    results = []
+    results = set()
     board = [["." for _ in range(n)] for _ in range(n)]
     diagsPos, diagsNeg = set(), set()
     
     def backtracking(row, col, curr_board=[]):
         bish_cnt = len(diagsNeg) # Or positive, doesnt matter
-        
+
         if bish_cnt >= n:
-            results.append(deepcopy(curr_board))
-            curr_board = board[:]
+            # if diagsPos not in totalDP and diagsNeg not in totalDN:
+            str_res = "".join(["".join(r) for r in curr_board])
+
+            results.add(str_res)
             return
 
-        if col >= n:
-            col, row = 0, row+1
-        elif row >= n:
+        if col >= n or row >= n:
             return
 
-        for col in range(n):
-            
-            for row in range(n):
+        for r in range(n):
+            for c in range(n):
                 # Check if doesn't violate constraints
-                if (row - col) in diagsNeg or (row + col) in diagsPos:
+                if (r - c) in diagsNeg or (r + c) in diagsPos:
                     continue
 
                 # Add bishop to board
-                curr_board[row][col] = bishop
+                curr_board[r][c] = bishop
 
                 # Add diagonal constraints
-                diagsPos.add(row + col); diagsNeg.add(row - col)
+                diagsPos.add(r + c); diagsNeg.add(r - c)
 
-                backtracking(row, col, curr_board)
+                backtracking(r, c, curr_board)
 
                 # Remove last bishop
-                curr_board[row][col] = "."
-                diagsPos.remove(row + col); diagsNeg.remove(row-col)
-        
-        
+                curr_board[r][c] = "."
+                diagsPos.remove(r + c); diagsNeg.remove(r-c)
 
     cp = deepcopy(board)
     backtracking(0, 0, cp)
     return results
 
-for _ in solveNBishops(2):
+sol = solveNBishops(8)
+for _ in sol:
     print(_)
+print( len(sol))
 
 """
     2x2 for 2 bishops solutions: 4
