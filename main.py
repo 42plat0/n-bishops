@@ -38,3 +38,8 @@ def solveNBishops(n):
 
     backtracking(0)
     return results
+
+for sol in solveNBishops(2):
+    print(sol)
+
+n2 = len(solveNBishops(2)) == 4
