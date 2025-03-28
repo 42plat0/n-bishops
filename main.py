@@ -1,6 +1,6 @@
 # Is different solution cause bishops can go in the same row, so updates are needed
 from copy import copy, deepcopy
-
+from functools import cache
 
 def solveNBishops(n: int = 8, row_start: int = 0, col_start: int = 0) -> list[str]:
     bishop = "B"
@@ -17,23 +17,60 @@ def solveNBishops(n: int = 8, row_start: int = 0, col_start: int = 0) -> list[st
     elif row_start < 0 or col_start < 0:
         raise IndexError(f"Stulpelio/eiles pradzia negali buti mazesne nei 0")
 
-    def addBishop(board: list[list], col: int, row: int, dN: set, dP: set) -> None:
+    def addBishop(board: list[list[str]], row: int, col: int, dN: set[int], dP: set[int]) -> None:
+        """
+        Adds chess piece to the board and stores its diagonal constraints
+
+        Parameters:
+            board (list[list[str]]) : Board
+            row   (int)             : Row number
+            col   (int)             : Column number
+            dN    (set[int])        : Set of numbers representing constraints in positive(↗) diagonal direction
+            dP    (set[int])        : Set of numbers representing constraints in negative(↘) diagonal direction
+        
+        Returns:
+            None
+        """
         # Add bishop to board
         # Add diagonal constraints
         board[row][col] = bishop
         dN.add(row - col)
         dP.add(row + col)
 
-    def delBishop(board: list[list], col: int, row: int, dN: set, dP: set) -> None:
-        # Remove last bishop
+    def delBishop(board: list[list[str]], row: int, col: int, dN: set[int], dP: set[int]) -> None:
+        """
+        Removes chess piece from the board and removes its diagonal constraints 
+
+        Parameters:
+            board (list[list[str]]) : Board
+            row   (int)             : Row number
+            col   (int)             : Column number
+            dN    (set[int])        : Set of numbers representing constraints in positive(↗) diagonal direction
+            dP    (set[int])        : Set of numbers representing constraints in negative(↘) diagonal direction
+        
+        Returns:
+            None
+        """
+
         board[row][col] = "."
         dN.remove(row - col)
         dP.remove(row + col)
 
-    def backtracking(row: int, col: int, curr_board: list = []) -> None:
+    def backtracking(row: int, col: int, curr_board: list[list[str]] = []) -> None:
+        """
+        Backtracks through the board searching for solution to the N bishop problem. Checking based on diagonal constraints defined above.
+
+        Parameters:
+            row (int)        : Row to backtrack from
+            col (int)        : Column to backtract from
+            curr_board(list) : Chess board holding solutions (verified or not), passed through each bactrack 
+
+        Return:
+            None
+        """
         bish_cnt = len(diagsNeg)  # Or positive, doesnt matter
 
-        if len(results) > 1000:
+        if len(results):
             return
 
         if bish_cnt >= n:
@@ -60,11 +97,24 @@ def solveNBishops(n: int = 8, row_start: int = 0, col_start: int = 0) -> list[st
     addBishop(cp, col_start, row_start, diagsNeg, diagsPos)
     backtracking(0, 0, cp)
 
-    return results
+    return results[0]
 
 
 def print_board(solution: list[str], figure: str, n: int = 8) -> None :
+    """
+    Prints out a pretty chess board with solution
+        
+    Parameters:
+        solution (list[str]): Board solution for N bishop problem
+        figure   (str)      : Single ascii char representing a chess piece ('B') 
+        n        (int)      : Board size
+
+    Returns:
+        None
+    """
+
     top_line = "  " + "_" * (n * 3 - 2)
+    __doc__ = "Lol"
 
     empty_cell = "|_|"
     figure_cell = f"|{figure}|"
@@ -88,9 +138,9 @@ def print_board(solution: list[str], figure: str, n: int = 8) -> None :
     print()
 
 
-sol = solveNBishops(col_start=1, row_start=1)
+sol = solveNBishops(col_start=2, row_start=2)
 print(sol)
-# print_board(sol, "B")
+print(print_board.__doc__)
 # print(sol)
 
 """
