@@ -1,6 +1,3 @@
-# Is different solution cause bishops can go in the same row, so updates are needed
-from copy import copy, deepcopy
-from functools import cache
 
 def solveNBishops(n: int = 8, row_start: int = 0, col_start: int = 0) -> list[str]:
     bishop = "B"
@@ -87,15 +84,15 @@ def solveNBishops(n: int = 8, row_start: int = 0, col_start: int = 0) -> list[st
                 if (r - c) in diagsNeg or (r + c) in diagsPos:
                     continue
 
-                addBishop(curr_board, c, r, diagsNeg, diagsPos)
+                addBishop(curr_board, r, c,diagsNeg, diagsPos)
 
                 backtracking(r, c, curr_board)
 
-                delBishop(curr_board, c, r, diagsNeg, diagsPos)
+                delBishop(curr_board, r, c,diagsNeg, diagsPos)
 
-    cp = deepcopy(board)
-    addBishop(cp, col_start, row_start, diagsNeg, diagsPos)
-    backtracking(0, 0, cp)
+
+    addBishop(board, col_start, row_start, diagsNeg, diagsPos)
+    backtracking(0, 0, board)
 
     return results[0]
 
@@ -114,6 +111,8 @@ def print_board(solution: list[str], figure: str, n: int = 8) -> None :
     """
 
     top_line = "  " + "_" * (n * 3 - 2)
+    bot_line = "  " + "‾" * (n * 3 - 2)
+
     __doc__ = "Lol"
 
     empty_cell = "|_|"
@@ -121,8 +120,8 @@ def print_board(solution: list[str], figure: str, n: int = 8) -> None :
 
     print(top_line)
 
-    for row in range(n):
-        print(n - row, end="")  # Row numbers
+    for row in range(n-1, -1, -1):
+        print(row + 1, end="")  # Row numbers
         for col in range(n):
             if solution[row][col] == figure:
                 print(figure_cell, end="") # Print figure
@@ -138,10 +137,8 @@ def print_board(solution: list[str], figure: str, n: int = 8) -> None :
     print()
 
 
-sol = solveNBishops(col_start=2, row_start=2)
-print(sol)
-print(print_board.__doc__)
-# print(sol)
+sol = solveNBishops(col_start=8, row_start=8)
+print_board(sol, "B")
 
 """
     2x2 for 2 bishops solutions: 4
