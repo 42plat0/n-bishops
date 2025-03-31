@@ -118,8 +118,7 @@ class NBishopSolver:
 
         return self.results[0]
 
-    @staticmethod
-    def print_board(solution: list[str], figure: str = "B", n: int = 8) -> None:
+    def print_board(self, solution: list[str]) -> None:
         """
         Prints out a pretty chess board with solution
 
@@ -129,24 +128,24 @@ class NBishopSolver:
             n        (int)      : Board size
         """
 
-        top_line = "  " + "_" * (n * 3 - 2)
+        top_line = "  " + "_" * (self. n * 3 - 2)
 
         empty_cell = "|_|"
-        figure_cell = f"|{figure}|"
+        figure_cell = f"|{self.bishop}|"
 
         print(top_line)
 
-        for row in range(n - 1, -1, -1):
+        for row in range(self.n - 1, -1, -1):
             print(row + 1, end="")  # Row numbers
-            for col in range(n):
-                if solution[row][col] == figure:
+            for col in range(self.n ):
+                if solution[row][col] == self.bishop:
                     print(figure_cell, end="")  # Print figure
                     continue
                 print(empty_cell, end="")  # Print empty cell
             print()  # Separate rows
 
         print(" ", end="")  # Space for letter alignment
-        for i in range(n):
+        for i in range(self.n):
             print(f" {chr(i + 97)} ", end="")  # Col letters
 
         print()
