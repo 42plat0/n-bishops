@@ -118,7 +118,7 @@ class NBishopSolver:
 
         return self.results[0]
 
-    def print_board(self, solution: list[str]) -> None:
+    def pprint_board(self, solution: list[str]) -> None:
         """
         Prints out a pretty chess board with solution
 
@@ -149,7 +149,12 @@ class NBishopSolver:
             print(f" {chr(i + 97)} ", end="")  # Col letters
 
         print()
+    
+    def print_board(self, solution: list[str]) -> None:
+        for row in solution:
+            print(row)
 
 solver = NBishopSolver(col_start=5, row_start=3)
 solution = solver.solve()
+solver.pprint_board(solution)
 solver.print_board(solution)
