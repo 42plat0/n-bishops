@@ -1,4 +1,16 @@
-def create_board_string(solution: list[tuple[int, int]], n=8) -> list[str]: 
+"""Helper functions for N-Bishops problem visualization."""
+
+def create_board_string(solution: list[tuple[int, int]], n=8) -> list[str]:
+    """Creates a 2D list representation of the board from bishop coordinates.
+
+    Args:
+        solution (list[tuple[int, int]]): A list of (row, col) tuples representing bishop positions.
+        n        (int)                  : The size of the chessboard (default is 8).
+
+    Returns:
+        A list of lists (2D list) representing the board,
+        with 'B' for bishops and '.' for empty squares.
+    """
     board = [["." for _ in range(n)] for _ in range(n)]
 
     for row, col in solution:
@@ -8,17 +20,26 @@ def create_board_string(solution: list[tuple[int, int]], n=8) -> list[str]:
 
 
 def print_board(solution: list[str], start_pos: tuple[int, int], n=8) -> None:
-    """
-    Prints out a pretty chess board with solution
+    """Prints a formatted chessboard with bishop positions.
+
+    Highlights the starting bishop position.
 
     Args:
-        solution (list[str]): Board solution for N bishop problem
-        figure   (str)      : Single ascii char representing a chess piece ('B')
-        n        (int)      : Board size
+        solution  (list[str])         : A 2D list representing the board state (from create_board_string).
+        start_pos (tuple[int, int])   : A tuple (row, col) indicating the first placed bishop.
+        n         (int)               : The size of the chessboard (default is 8).
     """
 
 
     def create_cell(figure: str) -> str:
+        """Creates a formatted cell string for the chessboard.
+
+        Args:
+            figure (str): A single character representing the cell content.
+
+        Returns:
+            A formatted string for the cell, including borders.
+        """
         return f"|{figure}|"
     
     empty_cell   = create_cell("_")

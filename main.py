@@ -1,10 +1,19 @@
 from helpers import *
 
-def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[str]:
+def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[tuple[int, int]]:
+    """Finds a single solution for the N-Bishops problem.
+    Args:
+        row_start (int): The row index for the mandatory first bishop.
+        col_start (int): The column index for the mandatory first bishop.
+        n (int)        : The size of the chessboard (default is 8).
+
+    Returns:
+        A list of (row, col) tuples representing the bishop positions in the
+        first found valid solution, or an empty list if no solution is found.
+    """
+    
     results = []
     diagsPos, diagsNeg = set(), set()
-    # Start from 0
-    board_result = []
 
     if row_start >= n or col_start >= n:
         raise IndexError(f"Stulpelio/eiles pradzia negali buti didesne nei {n}")
@@ -12,7 +21,15 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[st
         raise IndexError(f"Stulpelio/eiles pradzia negali buti mazesne nei 0")
 
     def get_covered_squares(board: list[tuple[int, int]]) -> set:
-        """Return set of squares covered by the bishops"""
+        """Calculates the set of squares covered by the given bishops.
+
+        Args:
+            board (list[tuple[int, int]]): A list of (row, col) tuples representing current bishop positions.
+
+        Returns:
+            A set of (row, col) tuples for all squares occupied or attacked
+            by the bishops.
+        """
         covered = set()
         
         for r, c in board:
@@ -35,6 +52,7 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[st
         Adds chess piece to the board and stores its diagonal constraints
 
         Parameters:
+            board (list[tuple[int, int]]) : The list representing the current bishop positions.
             row   (int)             : Row number
             col   (int)             : Column number
             dN    (set[int])        : Set of numbers representing constraints in positive(↗) diagonal direction
@@ -54,6 +72,7 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[st
         Removes chess piece from the board and removes its diagonal constraints 
 
         Parameters:
+            board (list[tuple[int, int]]) : The list representing the current bishop positions.
             row   (int)             : Row number
             col   (int)             : Column number
             dN    (set[int])        : Set of numbers representing constraints in positive(↗) diagonal direction
@@ -74,7 +93,7 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[st
         Parameters:
             row (int)        : Row to backtrack from
             col (int)        : Column to backtract from
-            curr_board(list) : Chess board holding solutions (verified or not), passed through each bactrack 
+            curr_board(list[tuple[int,int]]): The list of (row, col) tuples for currently placed bishops.
 
         Return:
             None
@@ -121,6 +140,6 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[st
 
 if __name__ ==  "__main__":
     start = (0, 3)
-    sol = solveNBishops(row_start=start[0], col_start=3)
-    print_board(create_board_string(sol), start_pos=(0,3,))
+    sol = solveNBishops(row_start=start[0], col_start=start[1])
+    print_board(create_board_string(sol), start_pos=start)
 
