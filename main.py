@@ -1,25 +1,40 @@
+from helpers import *
 
-def solveNBishops(n: int = 8, row_start: int = 0, col_start: int = 0) -> list[str]:
-    bishop = "B"
+def solveNBishops(row_start: int, col_start: int, n: int = 8) -> list[str]:
     results = []
-    board = [["." for _ in range(n)] for _ in range(n)]
     diagsPos, diagsNeg = set(), set()
-
     # Start from 0
-    row_start -= 1
-    col_start -= 1
+    board_result = []
 
-    if row_start > n or col_start > n:
+    if row_start >= n or col_start >= n:
         raise IndexError(f"Stulpelio/eiles pradzia negali buti didesne nei {n}")
     elif row_start < 0 or col_start < 0:
         raise IndexError(f"Stulpelio/eiles pradzia negali buti mazesne nei 0")
+
+    def get_covered_squares(board: list[list[str]]) -> set:
+        """Return set of squares covered by the bishops"""
+        covered = set()
+        
+        for r, c in board_result:
+            # Add the bishop's position
+            covered.add((r, c))
+            
+            # Add all squares on diagonals
+            directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+            for dr, dc in directions:
+                nr, nc = r + dr, c + dc
+                while 0 <= nr < n and 0 <= nc < n:
+                    covered.add((nr, nc))
+                    nr += dr
+                    nc += dc
+        
+        return covered
 
     def addBishop(board: list[list[str]], row: int, col: int, dN: set[int], dP: set[int]) -> None:
         """
         Adds chess piece to the board and stores its diagonal constraints
 
         Parameters:
-            board (list[list[str]]) : Board
             row   (int)             : Row number
             col   (int)             : Column number
             dN    (set[int])        : Set of numbers representing constraints in positive(↗) diagonal direction
@@ -30,7 +45,7 @@ def solveNBishops(n: int = 8, row_start: int = 0, col_start: int = 0) -> list[st
         """
         # Add bishop to board
         # Add diagonal constraints
-        board[row][col] = bishop
+        board_result.append((row, col,))
         dN.add(row - col)
         dP.add(row + col)
 
@@ -39,7 +54,6 @@ def solveNBishops(n: int = 8, row_start: int = 0, col_start: int = 0) -> list[st
         Removes chess piece from the board and removes its diagonal constraints 
 
         Parameters:
-            board (list[list[str]]) : Board
             row   (int)             : Row number
             col   (int)             : Column number
             dN    (set[int])        : Set of numbers representing constraints in positive(↗) diagonal direction
@@ -49,11 +63,11 @@ def solveNBishops(n: int = 8, row_start: int = 0, col_start: int = 0) -> list[st
             None
         """
 
-        board[row][col] = "."
+        board_result.pop()
         dN.remove(row - col)
         dP.remove(row + col)
 
-    def backtracking(row: int, col: int, curr_board: list[list[str]] = []) -> None:
+    def backtracking(row: int, col: int, curr_board: list[tuple[int, int]]) -> None:
         """
         Backtracks through the board searching for solution to the N bishop problem. Checking based on diagonal constraints defined above.
 
@@ -71,79 +85,40 @@ def solveNBishops(n: int = 8, row_start: int = 0, col_start: int = 0) -> list[st
             return
 
         if bish_cnt >= n:
-            str_res = ["".join(r) for r in curr_board]
-            results.append(str_res)
+            # Check if bishops cover all squares
+            if len(get_covered_squares(curr_board)) == n * n:
+                for tuple in board_result:
+                    results.append(tuple)
             return
 
-        if col >= n or row >= n:
+        if row >= n:
             return
 
-        for r in range(n):
-            for c in range(n):
+        for r in range(row, n):
+            start_col = col if row == r else 0
+            for c in range(start_col, n):
                 # Check if doesn't violate constraints
                 if (r - c) in diagsNeg or (r + c) in diagsPos:
                     continue
 
-                addBishop(curr_board, r, c,diagsNeg, diagsPos)
+                addBishop(curr_board, r, c, diagsNeg, diagsPos)
 
-                backtracking(r, c, curr_board)
+                backtracking(r, c + 1, curr_board)
 
-                delBishop(curr_board, r, c,diagsNeg, diagsPos)
-
-
-    addBishop(board, col_start, row_start, diagsNeg, diagsPos)
-    backtracking(0, 0, board)
-
-    return results[0]
+                delBishop(curr_board, r, c, diagsNeg, diagsPos)
 
 
-def print_board(solution: list[str], figure: str, n: int = 8) -> None :
-    """
-    Prints out a pretty chess board with solution
-        
-    Parameters:
-        solution (list[str]): Board solution for N bishop problem
-        figure   (str)      : Single ascii char representing a chess piece ('B') 
-        n        (int)      : Board size
+    addBishop(board_result, row_start, col_start, diagsNeg, diagsPos)
+    backtracking(0, 0, board_result)
 
-    Returns:
-        None
-    """
-
-    top_line = "  " + "_" * (n * 3 - 2)
-    bot_line = "  " + "‾" * (n * 3 - 2)
-
-    __doc__ = "Lol"
-
-    empty_cell = "|_|"
-    figure_cell = f"|{figure}|"
-
-    print(top_line)
-
-    for row in range(n-1, -1, -1):
-        print(row + 1, end="")  # Row numbers
-        for col in range(n):
-            if solution[row][col] == figure:
-                print(figure_cell, end="") # Print figure
-                continue
-            print(empty_cell, end="") # Print empty cell
-        else:
-            print() # Separate rows
-
-    print(" ", end="") # Space for letter alignment
-    for i in range(n):
-        print(f" {chr(i + 97)} ", end="")  # Col letters
-
-    print()
+    try:
+        return results
+    except:
+        print(f"Nerasta sprendimu {row_start}:{col_start}")
+        return []
 
 
-sol = solveNBishops(col_start=8, row_start=8)
-print_board(sol, "B")
+if __name__ ==  "__main__":
+    sol = solveNBishops(row_start=3, col_start=3)
+    print_board(create_board_string(sol), start_pos=(3,3,))
 
-"""
-    2x2 for 2 bishops solutions: 4
-     +                       +       + 
-    B B         B .         . .     . B
-    . .         B .         B B     . B 
-
-"""
