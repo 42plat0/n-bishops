@@ -1,6 +1,7 @@
+from typing import Optional
 """Helper functions for N-Bishops problem visualization."""
 
-def create_board_string(solution: list[tuple[int, int]], n=8) -> list[str]:
+def create_board_string(solution: list[tuple[int, int]], n=8) -> list[Optional[str]]:
     """Creates a 2D list representation of the board from bishop coordinates.
 
     Args:
@@ -11,6 +12,8 @@ def create_board_string(solution: list[tuple[int, int]], n=8) -> list[str]:
         A list of lists (2D list) representing the board,
         with 'B' for bishops and '.' for empty squares.
     """
+    if not len(solution):
+        return []
     board = [["." for _ in range(n)] for _ in range(n)]
 
     for row, col in solution:
@@ -29,7 +32,8 @@ def print_board(solution: list[str], start_pos: tuple[int, int], n=8) -> None:
         start_pos (tuple[int, int])   : A tuple (row, col) indicating the first placed bishop.
         n         (int)               : The size of the chessboard (default is 8).
     """
-
+    if not len(solution):
+        return
 
     def create_cell(figure: str) -> str:
         """Creates a formatted cell string for the chessboard.
@@ -66,3 +70,4 @@ def print_board(solution: list[str], start_pos: tuple[int, int], n=8) -> None:
         print(f" {chr(i + 97)} ", end="")  # Col letters
 
     print()
+    return

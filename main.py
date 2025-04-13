@@ -16,7 +16,7 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[tu
     diagsPos, diagsNeg = set(), set()
 
     if row_start >= n or col_start >= n:
-        raise IndexError(f"Stulpelio/eiles pradzia negali buti didesne nei {n}")
+        raise IndexError(f"Stulpelio/eiles pradzia negali buti didesne nei {n - 1}")
     elif row_start < 0 or col_start < 0:
         raise IndexError(f"Stulpelio/eiles pradzia negali buti mazesne nei 0")
 
@@ -132,6 +132,8 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[tu
     backtracking(0, 0, init_board)
 
     try:
+        if not len(results):
+            raise ValueError
         return results
     except:
         print(f"Nerasta sprendimu {row_start}:{col_start}")
@@ -139,7 +141,7 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[tu
 
 
 if __name__ ==  "__main__":
-    start = (0, 3)
+    start = (7, 7)
     sol = solveNBishops(row_start=start[0], col_start=start[1])
     print_board(create_board_string(sol), start_pos=start)
 
