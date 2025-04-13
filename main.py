@@ -1,156 +1,145 @@
-class NBishopSolver:
-    def __init__(self, board_size: int = 8, col_start: int = 1, row_start: int = 1) -> None:
+from helpers import *
+
+def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[tuple[int, int]]:
+    """Finds a single solution for the N-Bishops problem.
+    Args:
+        row_start (int): The row index for the mandatory first bishop.
+        col_start (int): The column index for the mandatory first bishop.
+        n (int)        : The size of the chessboard (default is 8).
+
+    Returns:
+        A list of (row, col) tuples representing the bishop positions in the
+        first found valid solution, or an empty list if no solution is found.
+    """
+    
+    results = []
+    diagsPos, diagsNeg = set(), set()
+
+    if row_start >= n or col_start >= n:
+        raise IndexError(f"Stulpelio/eiles pradzia negali buti didesne nei {n}")
+    elif row_start < 0 or col_start < 0:
+        raise IndexError(f"Stulpelio/eiles pradzia negali buti mazesne nei 0")
+
+    def get_covered_squares(board: list[tuple[int, int]]) -> set:
+        """Calculates the set of squares covered by the given bishops.
+
+        Args:
+            board (list[tuple[int, int]]): A list of (row, col) tuples representing current bishop positions.
+
+        Returns:
+            A set of (row, col) tuples for all squares occupied or attacked
+            by the bishops.
         """
-        Initialize the N Bishops solver.
+        covered = set()
         
-        Args:
-            n         (int): Size of the chessboard (default is 8x8)
-            row_start (int): Starting row for first bishop placement (1-indexed)
-            col_start (int): Starting column for first bishop placement (1-indexed)
-        """
-
-        self.n = board_size
-        self._validate_input(col_start, row_start) # Validate input before doing anything else
-
-        self.row_start = row_start - 1 # Adjust for 0 indexing
-        self.col_start = col_start - 1 # Adjust for 0 indexing
-
-        self.bishop = "B"
-        self.results = [] # Returning list, could be used to get more than 1 sol
-        self.board = [["." for _ in range(self.n)] for _ in range(self.n)] # Chess board holding solutions (verified or not), passed through each bactrack
-        self.diags_pos = set() # Set of numbers representing constraints in positive(↗) diagonal direction
-        self.diags_neg = set() # Set of numbers representing constraints in negative(↘) diagonal direction
-
-
-    def _validate_input(self, col_start, row_start) -> None:
-        """
-        Validate the input parameters for board size and starting position.
-
-        Args:
-            col_start (int): Input row number (1 indexing)
-            row_start (int): Input row number (1 indexing)
+        for r, c in board:
+            # Add the bishop's position
+            covered.add((r, c))
+            
+            # Add all squares on diagonals
+            directions = [(1, 1), (1, -1), (-1, 1), (-1, -1)]
+            for dr, dc in directions:
+                row_covered, col_covered = r + dr, c + dc
+                while 0 <= row_covered < n and 0 <= col_covered < n:
+                    covered.add((row_covered, col_covered))
+                    row_covered += dr
+                    col_covered += dc
         
-        Raises:
-            AssertionError: If starting row or column is out of board bounds  
+        return covered
+
+    def addBishop(board: list[tuple[int, int]], row: int, col: int, dN: set[int], dP: set[int]) -> None:
         """
+        Adds chess piece to the board and stores its diagonal constraints
 
-        assert col_start <= self.n, f"Stulpelio pradzia negali buti didesne nei {self.n}"
-        assert row_start <= self.n, f"Eiles pradzia negali buti didesne nei {self.n}"
-        assert col_start > 0,       f"Stulpelio pradzia negali buti mazesne nei 0"
-        assert row_start > 0,       f"Eiles pradzia negali buti mazesne nei 0"
-
-
-    def _add_figure(self, col: int, row: int) -> None:
-        """
-        Add bishop to the board at row[col] and stores positions diagonal constraints
-
-        Args:
+        Parameters:
+            board (list[tuple[int, int]]) : The list representing the current bishop positions.
             row   (int)             : Row number
             col   (int)             : Column number
         Returns:
             None
         """
+        # Add bishop to board
+        # Add diagonal constraints
+        board.append((row, col,))
+        dN.add(row - col)
+        dP.add(row + col)
 
-        self.board[row][col] = self.bishop 
-        self.diags_neg.add(row - col)
-        self.diags_pos.add(row + col)
-
-
-    def _del_figure(self, col: int, row: int) -> None:
+    def delBishop(board: list[tuple[int, int]], row: int, col: int, dN: set[int], dP: set[int]) -> None:
         """
-        Removes bishop from the board at row[col] and removes its diagonal constraints
+        Removes chess piece from the board and removes its diagonal constraints 
 
-        Args:
+        Parameters:
+            board (list[tuple[int, int]]) : The list representing the current bishop positions.
             row   (int)             : Row number
             col   (int)             : Column number
+            dN    (set[int])        : Set of numbers representing constraints in positive(↗) diagonal direction
+            dP    (set[int])        : Set of numbers representing constraints in negative(↘) diagonal direction
+        
+        Returns:
+            None
         """
-        self.board[row][col] = "."
-        self.diags_neg.remove(row - col)
-        self.diags_pos.remove(row + col)
-   
-    def _backtrack(self, col: int, row: int) -> None:
+
+        board.pop()
+        dN.remove(row - col)
+        dP.remove(row + col)
+
+    def backtracking(row: int, col: int, curr_board: list[tuple[int, int]]) -> None:
         """
         Backtracks through the board searching for solution to the N bishop problem
 
         Args:
             row (int)        : Row to backtrack from
             col (int)        : Column to backtract from
+            curr_board(list[tuple[int,int]]): The list of (row, col) tuples for currently placed bishops.
+
+        Return:
+            None
         """
         figure_count = len(self.diags_neg or self.diags_pos) 
 
         if len(self.results):
             return
 
-        if figure_count >= self.n:
-            str_res = ["".join(r) for r in self.board]
-            self.results.append(str_res)
+        if bish_cnt >= n:
+            # Check if bishops cover all squares
+            if len(get_covered_squares(curr_board)) == n * n:
+                for tuple in curr_board:
+                    results.append(tuple)
             return
 
-        if col >= self.n or row >= self.n:
+        if row >= n:
             return
 
-        for r in range(self.n):
-            for c in range(self.n):
+        for r in range(row, n):
+            start_col = col if row == r else 0
+            for c in range(start_col, n):
                 # Check if doesn't violate constraints
                 if (r - c) in self.diags_neg or (r + c) in self.diags_pos:
                     continue
 
-                self._add_figure(c, r)
-                self._backtrack (c, r)
-                self._del_figure(c, r)
+                addBishop(curr_board, r, c, diagsNeg, diagsPos)
 
-    def solve(self) -> list[str]:
-        """
-        Solve the N Bishops problem.
-        
-        Return:
-            list[str]: A solution with N bishops placed without conflicts
+                backtracking(r, c + 1, curr_board)
+
+                delBishop(curr_board, r, c, diagsNeg, diagsPos)
 
         Raises:
             ValueError: If no solutions were found
         """
 
-        self._add_figure(self.col_start, self.row_start)
-        self._backtrack(0, 0)
+    init_board = []
+    addBishop(init_board , row_start, col_start, diagsNeg, diagsPos)
+    backtracking(0, 0, init_board)
 
-        if not self.results:
-            raise ValueError(f"Sprendimu {self.n} dydzio lentoje su pradzia f{self.col_start}f{self.row_start} nerasta")
+    try:
+        return results
+    except:
+        print(f"Nerasta sprendimu {row_start}:{col_start}")
+        return []
 
-        return self.results[0]
 
-    @staticmethod
-    def print_board(solution: list[str], figure: str = "B", n: int = 8) -> None:
-        """
-        Prints out a pretty chess board with solution
+if __name__ ==  "__main__":
+    start = (0, 3)
+    sol = solveNBishops(row_start=start[0], col_start=start[1])
+    print_board(create_board_string(sol), start_pos=start)
 
-        Args:
-            solution (list[str]): Board solution for N bishop problem
-            figure   (str)      : Single ascii char representing a chess piece ('B')
-            n        (int)      : Board size
-        """
-
-        top_line = "  " + "_" * (n * 3 - 2)
-
-        empty_cell = "|_|"
-        figure_cell = f"|{figure}|"
-
-        print(top_line)
-
-        for row in range(n - 1, -1, -1):
-            print(row + 1, end="")  # Row numbers
-            for col in range(n):
-                if solution[row][col] == figure:
-                    print(figure_cell, end="")  # Print figure
-                    continue
-                print(empty_cell, end="")  # Print empty cell
-            print()  # Separate rows
-
-        print(" ", end="")  # Space for letter alignment
-        for i in range(n):
-            print(f" {chr(i + 97)} ", end="")  # Col letters
-
-        print()
-
-solver = NBishopSolver(col_start=5, row_start=3)
-solution = solver.solve()
-solver.print_board(solution)
