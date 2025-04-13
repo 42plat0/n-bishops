@@ -55,6 +55,9 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[tu
             board (list[tuple[int, int]]) : The list representing the current bishop positions.
             row   (int)             : Row number
             col   (int)             : Column number
+            dN    (set[int])        : Set of numbers representing constraints in positive(↗) diagonal direction
+            dP    (set[int])        : Set of numbers representing constraints in negative(↘) diagonal direction
+        
         Returns:
             None
         """
@@ -85,9 +88,9 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[tu
 
     def backtracking(row: int, col: int, curr_board: list[tuple[int, int]]) -> None:
         """
-        Backtracks through the board searching for solution to the N bishop problem
+        Backtracks through the board searching for solution to the N bishop problem. Checking based on diagonal constraints defined above.
 
-        Args:
+        Parameters:
             row (int)        : Row to backtrack from
             col (int)        : Column to backtract from
             curr_board(list[tuple[int,int]]): The list of (row, col) tuples for currently placed bishops.
@@ -95,9 +98,9 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[tu
         Return:
             None
         """
-        figure_count = len(self.diags_neg or self.diags_pos) 
+        bish_cnt = len(diagsNeg)  # Or positive, doesnt matter
 
-        if len(self.results):
+        if len(results):
             return
 
         if bish_cnt >= n:
@@ -114,7 +117,7 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[tu
             start_col = col if row == r else 0
             for c in range(start_col, n):
                 # Check if doesn't violate constraints
-                if (r - c) in self.diags_neg or (r + c) in self.diags_pos:
+                if (r - c) in diagsNeg or (r + c) in diagsPos:
                     continue
 
                 addBishop(curr_board, r, c, diagsNeg, diagsPos)
@@ -123,9 +126,6 @@ def solveNBishops(row_start: int = 3, col_start: int = 3, n: int = 8) -> list[tu
 
                 delBishop(curr_board, r, c, diagsNeg, diagsPos)
 
-        Raises:
-            ValueError: If no solutions were found
-        """
 
     init_board = []
     addBishop(init_board , row_start, col_start, diagsNeg, diagsPos)
